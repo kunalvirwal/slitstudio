@@ -42,13 +42,19 @@ export class WallpaperRenderer {
       tilt:recipe.tilt*Math.PI/180,contrast:recipe.contrast/100,
       slits:Number(recipe.slits),count:recipe.count,angle:recipe.angle*Math.PI/180,offset:recipe.offset/100,
       variation:recipe.variation/100,gap:recipe.gap/100,length:recipe.length/100,lengthVariation:recipe.lengthVariation/100,distribution:ENUMS.distribution.indexOf(recipe.distribution),
-      gloss:recipe.gloss/100,lightAngle:recipe.lightAngle*Math.PI/180,relief:recipe.relief/100,
+      gloss:recipe.gloss/100,lightAngle:recipe.lightAngle*Math.PI/180,relief:recipe.relief/100,edgeShading:Number(recipe.edgeShading),
       textureAmount:recipe.textureAmount/100,grain:recipe.grain/100,grainSize:recipe.grainSize,
       vignette:recipe.vignette/100,material:ENUMS.material.indexOf(recipe.material),texture:ENUMS.texture.indexOf(recipe.texture),
-      phase,view:['slit','surface','compare'].indexOf(view),compare
+      phase,view:['slit','surface','compare'].indexOf(view),compare,
+      pattern:ENUMS.pattern.indexOf(recipe.pattern),turbulence:recipe.turbulence/100,warpScale:recipe.warpScale/100,
+      stretch:recipe.stretch/100,position:recipe.position/100,pointCount:recipe.points.length
     };
     for (const [key,value] of Object.entries(values)) gl.uniform1f(this.uniforms['u_'+key],value);
     gl.uniform2f(this.uniforms.u_resolution,width,height);
+    gl.uniform2f(this.uniforms.u_center,recipe.centerX/100-.5,recipe.centerY/100-.5);
+    const points=new Float32Array(24),origins=new Float32Array(12);
+    recipe.points.forEach((point,i)=>{points.set([point.x,point.y,point.radius,point.strength],i*4);origins.set([point.originX,point.originY],i*2);});
+    gl.uniform4fv(this.uniforms['u_points[0]'],points);gl.uniform2fv(this.uniforms['u_origins[0]'],origins);
     for(const key of ['dark','mid','light']) gl.uniform3fv(this.uniforms['u_'+key],rgb(recipe[key]));
     gl.drawArrays(gl.TRIANGLES,0,6);
   }

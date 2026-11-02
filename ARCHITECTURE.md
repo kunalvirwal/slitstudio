@@ -49,6 +49,16 @@ Browser localStorage is best effort. Storage failure does not prevent rendering 
 
 ## Extending the studio
 
+### Direct surface design
+
+`surface-editor.js` supplies a modal canvas using the same renderer in continuous-surface mode. It edits the shared recipe in real time, with a bounded, local undo/redo history of full recipe snapshots. Closing the editor releases its temporary context; reopening creates a fresh canvas. Main controls, export, and share links all receive the same edited fields.
+
+Pattern family is independent of material: ribbons, radial pools, spiral vortex, and interference define the shape; liquid/silk/chrome/ripple define its profile and reflections. Complexity, turbulence, stretch, band offset, and center position expose the field structure. The animation phase can be scrubbed directly and is shown advancing during playback.
+
+Each bend point stores a rest position, a moved position, a radius, and a strength. Inverse mapping applies a Gaussian-weighted displacement before evaluating the height field. Moving a handle therefore pulls a local part of the material. At most six points are passed as uniform arrays, keeping the renderer bounded. Point coordinates and properties are validated and included in recipe URLs.
+
+Zero spacing bypasses the gap mask entirely to avoid artificial one-pixel hairlines. Edge shading has its own switch, independently controlling the stylized strip-edge shadows and highlights.
+
 **New material:** add a material enum in `model.js`, an option in `index.html`, and a profile branch in `heightAt`. Add a preset demonstrating it. The controls, storage, recipes, and export all share the same uniform mapping.
 
 **New displacement:** add the distribution enum and option, then implement its strip-index-to-offset formula in the shader. The inverse-mapping design preserves coverage for every formula.

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#f4f3ef">
+  <meta name="theme-color" content="#141814">
   <meta name="description" content="Shape liquid gradients. Cut light into strips. A hands-on generative wallpaper studio with glossy materials, textures, grain, and 4K export.">
   <title>Slit Studio — Cut light into something new.</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
@@ -38,6 +38,8 @@
           <section id="panel-surface" role="tabpanel" aria-labelledby="tab-surface">
             <div class="section-label">01 <span>THE MATERIAL</span></div>
             <label class="field-label" for="material">Surface type</label><div class="select-wrap"><select id="material" data-setting="material"><option value="liquid">Liquid gradient</option><option value="silk">Liquid silk</option><option value="chrome">Polished chrome</option><option value="ripple">Ripple glass</option></select><span>⌄</span></div>
+            <label class="field-label" for="pattern">Surface pattern</label><div class="select-wrap"><select id="pattern" data-setting="pattern"><option value="ribbons">Flowing ribbons</option><option value="pools">Radial pools</option><option value="vortex">Liquid vortex</option><option value="interference">Interference</option></select><span>⌄</span></div>
+            <button class="button design-surface-button" id="design-surface"><svg viewBox="0 0 24 24"><path d="M3 7c4-9 8 9 12 0s6-2 6-2M3 14c4-9 8 9 12 0s6-2 6-2M3 21c4-9 8 9 12 0s6-2 6-2"/></svg>Design the surface<span>↗</span></button>
             <div id="surface-sliders"></div>
             <div class="section-label color-label">02 <span>THE PALETTE</span><button id="palette-cycle" class="inline-button" title="Try another palette" aria-label="Try another palette">Shuffle ↗</button></div>
             <div class="color-inputs"><label><input type="color" id="color-dark" data-setting="dark" aria-label="Shadow color"><span>Shadow</span><code id="hex-dark"></code></label><label><input type="color" id="color-mid" data-setting="mid" aria-label="Body color"><span>Body</span><code id="hex-mid"></code></label><label><input type="color" id="color-light" data-setting="light" aria-label="Highlight color"><span>Light</span><code id="hex-light"></code></label></div>
@@ -51,7 +53,7 @@
             <p class="panel-note">Each strip samples a different part of the same liquid surface. Change the offset to reveal new rhythms.</p>
           </section>
           <section id="panel-finish" role="tabpanel" aria-labelledby="tab-finish" hidden>
-            <div class="section-label">01 <span>LIGHT & REFLECTION</span></div><div id="light-sliders"></div>
+            <div class="section-label">01 <span>LIGHT & REFLECTION</span></div><label class="toggle-row" for="edge-shading"><span>Shade strip edges<small>Turn off for clean, unshaded joins.</small></span><input id="edge-shading" type="checkbox" data-setting="edgeShading" role="switch"></label><div id="light-sliders"></div>
             <div class="section-label">02 <span>TEXTURE & ATMOSPHERE</span></div>
             <label class="field-label" for="texture">Texture</label><div class="select-wrap"><select id="texture" data-setting="texture"><option value="smooth">Smooth</option><option value="frosted">Frosted glass</option><option value="brushed">Brushed metal</option><option value="woven">Woven silk</option></select><span>⌄</span></div>
             <div id="finish-sliders"></div>

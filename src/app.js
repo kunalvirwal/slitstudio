@@ -1,6 +1,7 @@
 import { DEFAULT, LIMITS, sanitizeRecipe, aspectRatio, exportDimensions, encodeRecipe, decodeRecipe, seededRandom } from './model.js';
 import { PRESETS, PALETTES } from './presets.js';
 import { WallpaperRenderer } from './renderer.js';
+import { SurfaceEditor } from './surface-editor.js';
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
@@ -10,14 +11,14 @@ let recipe={...DEFAULT}, activePreset='vermilion', resetPreset='vermilion', view
 let animation=false, lastFrame=0, frameRequest=0, saveTimer=0, toastTimer=0, comparison=.5, exportSize=3840;
 
 const SLIDERS = {
-  'surface-sliders': [ ['flow','Liquid flow','%'], ['scale','Gradient scale','%'], ['tilt','Surface tilt','°'] ],
+  'surface-sliders': [ ['flow','Liquid flow','%'], ['scale','Gradient scale','%'], ['tilt','Surface tilt','°'], ['phase','Animation phase',' rad',.01,0,Math.PI*2] ],
   'color-sliders': [ ['contrast','Contrast','%'] ],
   'slit-sliders': [ ['count','Strip count','',1], ['angle','Cut angle','°'], ['offset','Displacement','%'], ['variation','Irregularity','%'], ['length','Strip length','%'], ['lengthVariation','Length variation','%'], ['gap','Space between','%'] ],
   'light-sliders': [ ['gloss','Gloss & shine','%'], ['lightAngle','Light direction','°'], ['relief','Strip depth','%'] ],
   'finish-sliders': [ ['textureAmount','Texture strength','%'], ['grain','Film grain','%'], ['grainSize','Grain size','×',.1], ['vignette','Vignette','%'] ]
 };
 for (const [id,sliders] of Object.entries(SLIDERS)) {
-  $('#'+id).innerHTML=sliders.map(([key,label,unit,step=1])=>`<div class="slider-control"><label class="slider-label" for="control-${key}"><span>${label}</span><output id="output-${key}" for="control-${key}" data-unit="${unit}"></output></label><input id="control-${key}" type="range" min="${LIMITS[key][0]}" max="${LIMITS[key][1]}" step="${step}" data-setting="${key}" aria-label="${label}"></div>`).join('');
+  $('#'+id).innerHTML=sliders.map(([key,label,unit,step=1,min=LIMITS[key][0],max=LIMITS[key][1]])=>`<div class="slider-control"><label class="slider-label" for="control-${key}"><span>${label}</span><output id="output-${key}" for="control-${key}" data-unit="${unit}"></output></label><input id="control-${key}" type="range" min="${min}" max="${max}" step="${step}" data-setting="${key}" aria-label="${label}"></div>`).join('');
 }
 
 function toast(message) {
@@ -45,7 +46,14 @@ function syncControls() {
   for(const key of ['dark','mid','light']) $('#hex-'+key).textContent=recipe[key];
   $$('.preset-card').forEach(card=>{const active=card.dataset.preset===activePreset;card.classList.toggle('active',active);card.setAttribute('aria-pressed',String(active));});
   $('#canvas-frame').style.aspectRatio=String(aspectRatio(recipe.aspect));
+  syncPhaseControl();
   fitCanvas();presetTitle();updateExportLabels();
+}
+function syncPhaseControl() {
+  const input=$('#control-phase'),phase=recipe.phase,turn=Math.PI*2;
+  input.min=Math.min(0,Math.floor(phase/turn)*turn);input.max=Math.max(turn,Math.ceil(phase/turn)*turn);
+  input.value=phase;input.style.setProperty('--progress',((phase-Number(input.min))/(Number(input.max)-Number(input.min))*100)+'%');
+  $('#output-phase').textContent=phase.toFixed(2)+' rad';
 }
 function fitCanvas() {
   const stage=$('#art-stage'), frame=$('#canvas-frame');
@@ -60,6 +68,7 @@ function renderFrame(timestamp) {
   if(animation) {
     if(lastFrame) recipe.phase+=(Math.min(timestamp-lastFrame,80)/1000)*.13;
     lastFrame=timestamp;
+    syncPhaseControl();
   }
   if(renderer && !renderer.lost) {
     const frame=$('#canvas-frame'), dpr=Math.min(window.devicePixelRatio||1,1.75);
@@ -92,6 +101,7 @@ for(const input of $$('[data-setting]')) {
   input.addEventListener('input',()=>{
     let value=input.type==='checkbox'?input.checked:input.type==='range'||input.type==='number'?Number(input.value):input.value;
     if(input.type==='number'&&input.value==='') return;
+    if(input.dataset.setting==='phase')setAnimation(false);
     updateRecipe({[input.dataset.setting]:value});
   });
 }
@@ -149,6 +159,8 @@ function setAnimation(next) {
   requestRender();if(!next)persist();
 }
 $('#animate-button').addEventListener('click',()=>setAnimation(!animation));
+const surfaceEditor=new SurfaceEditor({getRecipe:()=>recipe,onChange:patch=>updateRecipe(patch),onError:toast});
+$('#design-surface').addEventListener('click',()=>{setAnimation(false);surfaceEditor.open();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&animation)setAnimation(false);});
 
 function updateExportLabels() {

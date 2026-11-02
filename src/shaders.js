@@ -12,8 +12,12 @@ uniform vec2 u_resolution;
 uniform vec3 u_dark, u_mid, u_light;
 uniform float u_aspect, u_seed, u_flow, u_scale, u_tilt, u_contrast;
 uniform float u_slits, u_count, u_angle, u_offset, u_variation, u_gap, u_distribution, u_length, u_lengthVariation;
-uniform float u_gloss, u_lightAngle, u_relief, u_textureAmount, u_grain, u_grainSize, u_vignette;
+uniform float u_gloss, u_lightAngle, u_relief, u_edgeShading, u_textureAmount, u_grain, u_grainSize, u_vignette;
 uniform float u_material, u_texture, u_phase, u_view, u_compare;
+uniform float u_pattern, u_turbulence, u_warpScale, u_stretch, u_position, u_pointCount;
+uniform vec2 u_center;
+uniform vec4 u_points[6];
+uniform vec2 u_origins[6];
 const float PI = 3.14159265359;
 
 float hash(vec2 p) {
@@ -29,13 +33,34 @@ mat2 rotation(float a) { return mat2(cos(a), -sin(a), sin(a), cos(a)); }
 
 // A continuous height field: broad, domain-warped ridges with layered flow.
 float heightAt(vec2 p) {
+  for (int i=0;i<6;i++) {
+    if (float(i) < u_pointCount) {
+      vec2 target = (u_points[i].xy-.5)*vec2(u_aspect,1.);
+      vec2 origin = (u_origins[i]-.5)*vec2(u_aspect,1.);
+      float radius = u_points[i].z;
+      float influence = exp(-dot(p-target,p-target)/(radius*radius));
+      p -= (target-origin)*influence*u_points[i].w;
+    }
+  }
+  p -= u_center*vec2(u_aspect,1.);
   p = rotation(u_tilt) * p;
+  p.y /= u_stretch;
   float seed = u_seed * .0017;
-  float warp = sin(p.y * 2.4 + seed + u_phase*.5) * .34;
-  warp += sin(p.y * 5.3 + p.x * 1.7 - seed*.8) * .10;
-  warp += (noise(p * 2.3 + seed) - .5) * .16;
+  float warp = sin(p.y * 2.4 * u_warpScale + seed + u_phase*.5) * .34;
+  warp += sin(p.y * 5.3 * u_warpScale + p.x * 1.7 - seed*.8) * .10;
+  warp += (noise(p * 2.3 * u_warpScale + seed) - .5) * u_turbulence * .5333;
   float x = p.x + warp * u_flow;
-  float t = x * u_scale * 6.3 + seed*.3 + u_phase;
+  float t = x * u_scale * 6.3 + seed*.3 + u_phase + u_position*PI*2.;
+  if (u_pattern > .5 && u_pattern < 1.5) {
+    t = length(vec2(p.x,p.y*1.15)) * u_scale * 10. - warp*u_flow*4. + u_phase + u_position*PI*2.;
+  } else if (u_pattern > 1.5 && u_pattern < 2.5) {
+    float radius = length(p);
+    float theta = atan(p.y,p.x);
+    // An integer angular harmonic keeps the polar field continuous at the atan seam.
+    t = radius*u_scale*12. - theta*2. + sin(radius*6. + seed)*u_flow + u_phase + u_position*PI*2.;
+  } else if (u_pattern > 2.5) {
+    t = (sin(p.x*u_scale*5. + warp*u_flow*3.) + cos(p.y*u_scale*7. + seed*.2))*2.4 + u_phase + u_position*PI*2.;
+  }
   float wave = .5 + .5 * sin(t + p.y * .16);
   if (u_material > .5 && u_material < 1.5) {
     wave = wave * .88 + .12 * (.5 + .5 * sin(t*2. + p.y*.7));
@@ -113,10 +138,11 @@ void main() {
     q.x += (local-.5) * u_relief * .085;
     source = rotation(-u_angle) * q;
     float shadeWidth = .17 + u_relief*.37;
-    edgeShadow = mix(1.-u_relief*.72,1.,smoothstep(0.,shadeWidth,local));
-    edgeLight = exp(-local*62.) * u_relief * u_gloss * .10;
+    edgeShadow = mix(1.-u_relief*u_edgeShading*.72,1.,smoothstep(0.,shadeWidth,local));
+    edgeLight = exp(-local*62.) * u_relief * u_gloss * .10 * u_edgeShading;
     float feather = min(.03,u_count/u_resolution.x);
-    gapMask *= smoothstep(u_gap,u_gap+feather,local);
+    // Zero is truly gapless. Applying smoothstep(0, feather, local) leaves a dark hairline.
+    if (u_gap > .0001) gapMask *= smoothstep(u_gap,u_gap+feather,local);
   }
   vec3 color = materialAt(source) * edgeShadow + u_light * edgeLight;
   color = mix(u_dark*.43,color,gapMask);

@@ -29,3 +29,12 @@ test('a fixed seed reproduces random choices',()=>{
   const sequence=Array.from({length:12},a);
   assert.deepEqual(sequence,Array.from({length:12},b));assert.notDeepEqual(sequence,Array.from({length:12},c));
 });
+test('direct surface edits survive sharing with bounded, independent pull points',()=>{
+  const point={x:.62,y:.48,originX:.4,originY:.6,radius:.42,strength:1.3};
+  const recipe={...DEFAULT,pattern:'vortex',turbulence:60,warpScale:180,phase:4.17,points:[point]};
+  assert.deepEqual(decodeRecipe('#recipe='+encodeRecipe(recipe)),recipe);
+  const bounded=sanitizeRecipe({points:Array.from({length:30},()=>({x:999,y:-6,radius:100,strength:Infinity}))});
+  assert.equal(bounded.points.length,6);assert.equal(bounded.points[0].x,1);assert.equal(bounded.points[0].y,0);
+  assert.equal(bounded.points[0].radius,1.5);assert.equal(bounded.points[0].strength,1);
+  bounded.points[0].x=.4;assert.equal(bounded.points[1].x,1);
+});

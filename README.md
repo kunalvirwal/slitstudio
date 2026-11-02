@@ -21,9 +21,13 @@ npm run preview # Serve the production output
 ## What you can make
 
 - Four continuous materials: liquid gradient, liquid silk, polished chrome, and ripple glass.
+- A surface designer with ribbons, radial pools, a spiral vortex, and interference patterns.
+- Up to six draggable bend points with independent influence radius and pull strength, plus a draggable pattern center. Points also support arrow keys, Shift for larger steps, and Delete to remove.
+- Surface editing undo/redo, flow complexity, turbulence, stretch, band offset, and direct animation phase scrubbing. Dragging phase pauses playback; its value advances visibly during animation.
 - Adjustable liquid flow, surface scale, tilt, three-color palette, and contrast.
 - Strips with independent count, length, length variation, cut angle, displacement, irregularity, gaps, and four displacement patterns.
 - Adjustable gloss, light direction, and strip depth. Drag over the artwork to move its light.
+- Truly gapless strips at zero spacing, with a separate edge-shading switch for clean joins.
 - Smooth, frosted glass, brushed metal, and woven silk textures, with independent texture strength.
 - Film grain, grain size, vignette, and subtle anti-banding dither.
 - Sliced, continuous surface, and interactive comparison views.
@@ -40,6 +44,7 @@ Keyboard shortcuts when the page background has focus: **R** randomizes, **Space
 index.html          Accessible application shell and dialogs
 src/
   app.js            Controls, preview orchestration, persistence, and export UI
+  surface-editor.js Direct-manipulation editor, bend points, and editing history
   model.js          Recipe schema, validation, serialization, export sizing
   presets.js        Curated recipes and palettes
   renderer.js       WebGL context, uniforms, export and resource lifecycle
