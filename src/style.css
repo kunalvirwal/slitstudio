@@ -2511,6 +2511,9 @@ kbd {
 .studio { border-color:#2b2b2b; border-radius:8px; height:clamp(720px,70vh,1000px); }
 .studio { grid-template-rows:minmax(0,1fr); }
 .controls { min-height:0; height:auto; }
+.control-panels { flex:1 1 0; min-height:0; overflow-y:auto; padding-bottom:14px; }
+.control-bottom { position:relative; z-index:1; background:#111111; }
+.canvas-workspace { min-height:0; overflow:hidden; }
 .preview-toolbar,.preview-bottom { flex-shrink:0; }
 .art-stage { flex:1 1 0; }
 .controls { background:#111111; border-right-color:#292929; }
@@ -2588,6 +2591,7 @@ dialog,#surface-designer { background:#121212; border-color:#363636; border-radi
 @media(max-width:760px) {
   .studio { height:auto; }
   .art-stage { flex:0 0 auto; }
+  .control-panels { flex:1 1 auto; overflow:visible; }
   .workspace-heading h1 { font-size:26px; }
   .control-tabs { gap:0; }
   .preset-heading h2 { font-size:18px; }
