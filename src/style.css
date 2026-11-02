@@ -2763,3 +2763,10 @@ body.wallpaper-preview-open { overflow:hidden; }
 .video-render:not(:disabled) { cursor:pointer; }
 .video-loop-badge { font-size:11px; }
 @media(max-width:540px) { #export-dialog,#export-dialog[data-export-kind="video"] { padding:22px 20px 0; } #export-dialog[data-export-kind="image"] { padding-bottom:24px; } }
+
+/* Completed video: Download stays visible in the fixed action area. */
+.video-actions.has-result { align-items:center; gap:12px; }
+.video-actions.has-result .video-download { flex:1; min-width:0; }
+.video-actions.has-result .video-render { flex:0 0 auto; padding:14px 18px; background:#262626; color:#c5c5c5; font-size:12px; box-shadow:none; }
+.video-actions.has-result .video-render:hover { background:#333; color:#fff; }
+@media(max-width:420px) { .video-actions.has-result { gap:8px; } .video-actions.has-result .video-render { padding:14px 10px; font-size:11px; } }

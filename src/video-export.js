@@ -42,6 +42,7 @@ export class VideoExportDialog {
     this.$('.video-loop-hint').after(advanced);
     this.$('.video-section-title:not(.video-output-title)').textContent='02 / ANIMATION & LOOP';
     this.$('.video-actions').before(this.$('.video-footnote'));
+    this.$('.video-actions').prepend(this.$('.video-download'));this.$('.video-download').hidden=true;
     this.$('.video-description').textContent='Render a sharp, frame-perfect animation from your wallpaper.';
     const tabs=document.createElement('div');tabs.className='export-kind-switch';tabs.setAttribute('role','group');tabs.setAttribute('aria-label','Export type');
     tabs.innerHTML=typeCards('image');image.querySelector('.dialog-heading').after(tabs);tabs.querySelector('.open-video-export').addEventListener('click',()=>this.open());
@@ -79,7 +80,7 @@ export class VideoExportDialog {
   plan() {return videoPlan(this.snapshot,this.settings(),this.getMaxSize());}
   releaseResult() {
     const video=this.$('video');video.pause();video.removeAttribute('src');video.load();
-    if(this.url)URL.revokeObjectURL(this.url);this.url=null;this.$('.video-result').hidden=true;
+    if(this.url)URL.revokeObjectURL(this.url);this.url=null;this.$('.video-result').hidden=true;this.$('.video-download').hidden=true;this.$('.video-actions').classList.remove('has-result');
   }
   async refresh() {
     const token=++this.probeToken;this.$('.video-render').disabled=true;this.$('.video-render span').textContent='Checking settings…';this.$('.video-error').hidden=true;
@@ -133,7 +134,7 @@ export class VideoExportDialog {
         this.$('.video-progress-detail').textContent=progress.finalizing?'Writing the final playable file.':`Elapsed ${Math.round(elapsed)} s${remaining===null?'':` · about ${Math.ceil(remaining)} s remaining`}`;
       }});
       this.$('.video-progress').hidden=true;
-      if(blob){this.url=URL.createObjectURL(blob);this.$('video').src=this.url;this.$('video').loop=plan.loopable;this.$('.video-result-info').textContent=`${plan.width} × ${plan.height} · ${plan.fps} fps · ${plan.duration.toFixed(2)} s · ${formatSize(blob.size)} · ${plan.format.label}`;this.$('.video-result').hidden=false;}
+      if(blob){this.url=URL.createObjectURL(blob);this.$('video').src=this.url;this.$('video').loop=plan.loopable;this.$('.video-result-info').textContent=`${plan.width} × ${plan.height} · ${plan.fps} fps · ${plan.duration.toFixed(2)} s · ${formatSize(blob.size)} · ${plan.format.label}`;this.$('.video-result').hidden=false;this.$('.video-download').hidden=false;this.$('.video-actions').classList.add('has-result');requestAnimationFrame(()=>this.dialog.scrollTo({top:this.dialog.scrollHeight,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}));}
       else this.onMessage('Video saved directly to disk.');
       this.$('.video-render span').textContent='Render again';
     } catch(error) {
