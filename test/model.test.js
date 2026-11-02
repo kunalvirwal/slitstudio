@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { DEFAULT, sanitizeRecipe, encodeRecipe, decodeRecipe, exportDimensions, validateDimensions, seededRandom } from '../src/model.js';
+import { DEFAULT, sanitizeRecipe, encodeRecipe, decodeRecipe, exportDimensions, validateDimensions, seededRandom, phasePeriod, wrapPhase } from '../src/model.js';
 
 test('shared recipes round-trip every visual parameter, including the frozen animation frame',()=>{
   const recipe={...DEFAULT,material:'chrome',texture:'brushed',phase:3.124,slits:false,seed:29452,aspect:'9:16'};
@@ -31,10 +31,23 @@ test('a fixed seed reproduces random choices',()=>{
 });
 test('direct surface edits survive sharing with bounded, independent pull points',()=>{
   const point={x:.62,y:.48,originX:.4,originY:.6,radius:.42,strength:1.3};
-  const recipe={...DEFAULT,pattern:'vortex',turbulence:60,warpScale:180,phase:4.17,points:[point]};
+  const recipe={...DEFAULT,pattern:'vortex',turbulence:60,warpScale:180,phase:4.17,animationSpeed:2.75,points:[point]};
   assert.deepEqual(decodeRecipe('#recipe='+encodeRecipe(recipe)),recipe);
   const bounded=sanitizeRecipe({points:Array.from({length:30},()=>({x:999,y:-6,radius:100,strength:Infinity}))});
   assert.equal(bounded.points.length,6);assert.equal(bounded.points[0].x,1);assert.equal(bounded.points[0].y,0);
   assert.equal(bounded.points[0].radius,1.5);assert.equal(bounded.points[0].strength,1);
   bounded.points[0].x=.4;assert.equal(bounded.points[1].x,1);
+  assert.equal(sanitizeRecipe({animationSpeed:Infinity}).animationSpeed,1);
+  assert.equal(sanitizeRecipe({animationSpeed:1000}).animationSpeed,10);
+});
+test('animation phase wraps at the actual material loop boundary, including negative scrubs',()=>{
+  for(const pattern of ['ribbons','pools','interference','vortex']) {
+    const period=phasePeriod(pattern);
+    assert.equal(wrapPhase(period,pattern),0);
+    assert.ok(Math.abs(wrapPhase(period+.02,pattern)-.02)<1e-10);
+    assert.ok(Math.abs(wrapPhase(-.02,pattern)-(period-.02))<1e-10);
+    assert.equal(sanitizeRecipe({pattern,phase:period}).phase,0);
+  }
+  assert.equal(phasePeriod('vortex')*180/Math.PI,360);
+  assert.equal(phasePeriod('ribbons')*180/Math.PI,720);
 });

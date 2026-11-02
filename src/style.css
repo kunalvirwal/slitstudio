@@ -2605,3 +2605,61 @@ dialog,#surface-designer { background:#121212; border-color:#363636; border-radi
 
 #wallpaper { cursor:default; touch-action:pan-y; }
 .light-drag-enabled #wallpaper { cursor:crosshair; touch-action:none; }
+
+/* Wallpaper-only preview. No editor surfaces or tinted fullscreen backgrounds. */
+body.wallpaper-preview-open { overflow:hidden; }
+#immersive-preview {
+  position:fixed; inset:0; z-index:1000; background:#000; overflow:hidden; color:#fff;
+  outline:none; isolation:isolate;
+}
+#immersive-preview:fullscreen { background:#000; width:100%; height:100%; }
+#immersive-canvas { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); display:block; }
+.preview-hud {
+  position:absolute; left:0; right:0; z-index:2; display:flex; align-items:center;
+  justify-content:space-between; padding:28px 36px; gap:20px;
+  opacity:0; pointer-events:none; transition:opacity .25s ease,transform .25s ease;
+}
+.preview-hud-top { top:0; padding-bottom:75px; background:linear-gradient(#000a,transparent); transform:translateY(-10px); }
+.preview-hud-bottom { bottom:0; padding-top:75px; background:linear-gradient(transparent,#000b); transform:translateY(10px); }
+.hud-visible .preview-hud,.preview-hud:focus-within { opacity:1; pointer-events:auto; transform:translateY(0); }
+.preview-hud button {
+  display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:12px 15px;
+  color:#f4f4f4; font-size:14px; border:1px solid #ffffff26; border-radius:6px;
+  background:#1119; backdrop-filter:blur(15px); transition:background .15s;
+}
+.preview-hud button:hover { background:#ffffff24; }
+.preview-hud button:focus-visible { outline:2px solid #7da7ff; outline-offset:4px; }
+.preview-hud svg { width:18px; height:18px; }
+.preview-hud kbd { font:10px 'DM Sans',sans-serif; color:#bbb; background:#ffffff13; border:1px solid #ffffff20; margin-left:12px; }
+.preview-wordmark { font:600 19px Manrope,sans-serif; letter-spacing:-1px; color:#ffffffb3; }
+.immersive-info>span { font-size:10px; letter-spacing:1.7px; color:#ddd; }
+.immersive-info>p { margin:8px 0 0; font-size:12px; color:#aaa; }
+.immersive-actions { display:flex; gap:10px; align-items:center; }
+.preview-hud .preview-export { background:#eee; border-color:#eee; color:#111; }
+.preview-hud .preview-export:hover { background:#fff; }
+@media(max-width:760px) {
+  .preview-hud { padding:18px; gap:12px; }
+  .preview-hud-top { padding-bottom:70px; }
+  .preview-hud-bottom { padding-top:70px; flex-wrap:wrap; }
+  .immersive-info { width:100%; }
+  .immersive-info>p { font-size:11px; }
+  .immersive-actions { width:100%; gap:8px; }
+  .preview-hud button { font-size:12px; padding:10px 12px; }
+  .preview-hud kbd { display:none; }
+  .preview-hud .preview-copy span { display:none; }
+  .preview-wordmark { font-size:17px; }
+}
+@media(prefers-reduced-motion:reduce) { .preview-hud { transition:none; } }
+
+/* Interaction states and compact numeric animation controls. */
+.toggle-row input { background:#3c3c3c; }
+.toggle-row input:checked { background:#7da7ff; }
+.toggle-row input:after { background:#ffffff; }
+.format-control select { appearance:auto; padding:7px 1px 7px 3px; cursor:pointer; }
+.speed-field { display:flex; align-items:center; gap:5px; color:#999; font-size:12px; }
+.speed-field input { width:59px; border:1px solid #3b3b3b; border-radius:4px; padding:4px 5px; background:#1e1e1e; color:#ddd; font-size:12px; text-align:right; }
+.preview-speed { display:flex; align-items:center; gap:7px; font-size:12px; color:#ddd; background:#1119; padding:9px 12px; border:1px solid #ffffff26; border-radius:6px; backdrop-filter:blur(15px); }
+.preview-speed input { width:55px; padding:3px 5px; background:#1119; border:1px solid #ffffff30; border-radius:4px; color:#fff; font-size:13px; }
+@media(max-width:760px) { .immersive-actions { flex-wrap:wrap; } .preview-speed { font-size:11px; padding:8px; } }
+#immersive-preview:not(.hud-visible) { cursor:none; }
+#immersive-preview.hud-visible { cursor:default; }

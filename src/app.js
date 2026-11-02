@@ -1,7 +1,8 @@
-import { DEFAULT, LIMITS, sanitizeRecipe, aspectRatio, exportDimensions, encodeRecipe, decodeRecipe, seededRandom } from './model.js';
+import { DEFAULT, LIMITS, sanitizeRecipe, aspectRatio, exportDimensions, encodeRecipe, decodeRecipe, seededRandom, phasePeriod, wrapPhase } from './model.js';
 import { PRESETS, PALETTES } from './presets.js';
 import { WallpaperRenderer } from './renderer.js';
 import { SurfaceEditor } from './surface-editor.js';
+import { ImmersivePreview } from './preview.js';
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
@@ -11,7 +12,7 @@ let recipe={...DEFAULT}, activePreset='vermilion', resetPreset='vermilion', view
 let animation=false, lastFrame=0, frameRequest=0, saveTimer=0, toastTimer=0, comparison=.5, exportSize=3840;
 
 const SLIDERS = {
-  'surface-sliders': [ ['flow','Liquid flow','%'], ['scale','Gradient scale','%'], ['tilt','Surface tilt','°'], ['phase','Animation phase',' rad',.01,0,Math.PI*2] ],
+  'surface-sliders': [ ['flow','Liquid flow','%'], ['scale','Gradient scale','%'], ['tilt','Surface tilt','°'], ['phase','Animation phase','°',1,0,360], ['animationSpeed','Animation speed','×',.05] ],
   'color-sliders': [ ['contrast','Contrast','%'] ],
   'slit-sliders': [ ['count','Strip count','',1], ['angle','Cut angle','°'], ['offset','Displacement','%'], ['variation','Irregularity','%'], ['length','Strip length','%'], ['lengthVariation','Length variation','%'], ['gap','Space between','%'] ],
   'light-sliders': [ ['gloss','Gloss & shine','%'], ['lightAngle','Light direction','°'], ['relief','Strip depth','%'] ],
@@ -20,6 +21,8 @@ const SLIDERS = {
 for (const [id,sliders] of Object.entries(SLIDERS)) {
   $('#'+id).innerHTML=sliders.map(([key,label,unit,step=1,min=LIMITS[key][0],max=LIMITS[key][1]])=>`<div class="slider-control"><label class="slider-label" for="control-${key}"><span>${label}</span><output id="output-${key}" for="control-${key}" data-unit="${unit}"></output></label><input id="control-${key}" type="range" min="${min}" max="${max}" step="${step}" data-setting="${key}" aria-label="${label}"></div>`).join('');
 }
+const speedControl=$('#control-animationSpeed').closest('.slider-control');
+speedControl.querySelector('.slider-label').outerHTML='<div class="slider-label"><label for="control-animationSpeed">Animation speed</label><span class="speed-field"><input id="animation-speed-number" type="number" min="0" max="10" step="0.05" data-setting="animationSpeed" aria-label="Exact animation speed"><span>×</span><output id="output-animationSpeed" data-unit="×" hidden></output></span></div>';
 
 function toast(message) {
   clearTimeout(toastTimer);$('#toast').textContent=message;$('#toast').classList.add('visible');
@@ -36,7 +39,7 @@ function presetTitle() {
 function syncControls() {
   for(const input of $$('[data-setting]')) {
     const key=input.dataset.setting;
-    if(input.type==='checkbox') input.checked=recipe[key];else input.value=recipe[key];
+    if(input.type==='checkbox') input.checked=recipe[key];else if(input.id!=='animation-speed-number'||document.activeElement!==input) input.value=recipe[key];
     if(input.type==='range') {
       const percent=(recipe[key]-Number(input.min))/(Number(input.max)-Number(input.min))*100;
       input.style.setProperty('--progress',percent+'%');
@@ -50,10 +53,10 @@ function syncControls() {
   fitCanvas();presetTitle();updateExportLabels();
 }
 function syncPhaseControl() {
-  const input=$('#control-phase'),phase=recipe.phase,turn=Math.PI*2;
-  input.min=Math.min(0,Math.floor(phase/turn)*turn);input.max=Math.max(turn,Math.ceil(phase/turn)*turn);
+  const input=$('#control-phase'),phase=recipe.phase*180/Math.PI;
+  input.min=0;input.max=phasePeriod(recipe.pattern)*180/Math.PI;
   input.value=phase;input.style.setProperty('--progress',((phase-Number(input.min))/(Number(input.max)-Number(input.min))*100)+'%');
-  $('#output-phase').textContent=phase.toFixed(2)+' rad';
+  $('#output-phase').textContent=Math.round(phase)+'°';
 }
 function fitCanvas() {
   const stage=$('#art-stage'), frame=$('#canvas-frame');
@@ -66,7 +69,7 @@ function requestRender() {if(!frameRequest) frameRequest=requestAnimationFrame(r
 function renderFrame(timestamp) {
   frameRequest=0;
   if(animation) {
-    if(lastFrame) recipe.phase+=(Math.min(timestamp-lastFrame,80)/1000)*.13;
+    if(lastFrame) recipe.phase=wrapPhase(recipe.phase+(Math.min(timestamp-lastFrame,80)/1000)*.13*recipe.animationSpeed,recipe.pattern);
     lastFrame=timestamp;
     syncPhaseControl();
   }
@@ -76,6 +79,7 @@ function renderFrame(timestamp) {
     try {renderer.render(recipe,{width,height,view,compare:comparison});}
     catch(error){showRendererError(error);}
   }
+  if(immersivePreview.opened) {try{immersivePreview.render();}catch(error){toast(error.message);immersivePreview.close();}}
   if(animation) requestRender();
 }
 function showRendererError(error) {
@@ -101,10 +105,11 @@ for(const input of $$('[data-setting]')) {
   input.addEventListener('input',()=>{
     let value=input.type==='checkbox'?input.checked:input.type==='range'||input.type==='number'?Number(input.value):input.value;
     if(input.type==='number'&&input.value==='') return;
-    if(input.dataset.setting==='phase')setAnimation(false);
+    if(input.dataset.setting==='phase'){setAnimation(false);value=value*Math.PI/180;}
     updateRecipe({[input.dataset.setting]:value});
   });
 }
+$('#animation-speed-number').addEventListener('blur',()=>$('#animation-speed-number').value=recipe.animationSpeed);
 function activateTab(name,{focus=false}={}) {
   for(const tab of $$('.control-tab')) {const active=tab.dataset.tab===name;tab.classList.toggle('active',active);tab.setAttribute('aria-selected',String(active));tab.tabIndex=active?0:-1;if(active&&focus)tab.focus();}
   for(const panel of $$('.control-panels>[role=tabpanel]')) panel.hidden=panel.id!=='panel-'+name;
@@ -156,10 +161,12 @@ function setAnimation(next) {
   animation=next;lastFrame=0;
   $('#animate-button').innerHTML=icon(animation?'pause':'play')+`<span>${animation?'Pause':'Animate'}</span>`;
   $('#animate-button').setAttribute('aria-pressed',String(animation));
+  immersivePreview.sync();
   requestRender();if(!next)persist();
 }
 $('#animate-button').addEventListener('click',()=>setAnimation(!animation));
 const surfaceEditor=new SurfaceEditor({getRecipe:()=>recipe,onChange:patch=>updateRecipe(patch),onError:toast});
+const immersivePreview=new ImmersivePreview({getRecipe:()=>recipe,isAnimating:()=>animation,onAnimate:()=>setAnimation(!animation),onSpeed:value=>{updateRecipe({animationSpeed:value});immersivePreview.sync();},onExport:openExport,onCopy:()=>$('#share-button').click(),onRender:requestRender,onError:toast});
 $('#design-surface').addEventListener('click',()=>{setAnimation(false);surfaceEditor.open();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&animation)setAnimation(false);});
 
@@ -205,12 +212,10 @@ $('#share-button').addEventListener('click',async()=>{
 window.addEventListener('hashchange',()=>{const restored=decodeRecipe(location.hash);if(restored){setAnimation(false);recipe=restored;activePreset=null;syncControls();persist();}});
 
 $('#fullscreen-button').addEventListener('click',async()=>{
-  const workspace=$('.canvas-workspace');
-  try{if(document.fullscreenElement)await document.exitFullscreen();else if(workspace.requestFullscreen)await workspace.requestFullscreen();else workspace.classList.toggle('expanded');}
-  catch{workspace.classList.toggle('expanded');}
-  fitCanvas();
+  await immersivePreview.open();
 });
-document.addEventListener('fullscreenchange',()=>{fitCanvas();$('#fullscreen-button').setAttribute('aria-label',document.fullscreenElement?'Exit expanded preview':'Expand preview');});
+$('#fullscreen-button').setAttribute('aria-label','Full screen wallpaper preview');
+$('#fullscreen-button').title='Full screen wallpaper preview';
 document.addEventListener('keydown',event=>{
   if(event.key==='Escape'&&$('.canvas-workspace').classList.contains('expanded')){$('.canvas-workspace').classList.remove('expanded');fitCanvas();return;}
   if(event.ctrlKey||event.metaKey||event.altKey||event.target.closest('input,select,textarea,button,a,[contenteditable]')||$('dialog[open]'))return;

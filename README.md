@@ -24,6 +24,8 @@ npm run preview # Serve the production output
 - A surface designer with ribbons, radial pools, a spiral vortex, and interference patterns.
 - Up to six draggable bend points with independent influence radius and pull strength, plus a draggable pattern center. Points also support arrow keys, Shift for larger steps, and Delete to remove.
 - Surface editing undo/redo, flow complexity, turbulence, stretch, band offset, and direct animation phase scrubbing. Dragging phase pauses playback; its value advances visibly during animation.
+- Animation phase is shown as an angle in degrees and wraps at 720° (360° for vortex). Animation speed has a slider and an exact numeric multiplier from 0× to 10× (default 1×).
+- Fullscreen wallpaper preview fills the display with the artwork. Controls appear near the screen edges and fade away; Esc returns to the editor. Animation, speed, recipe copying, and export are available from its overlay.
 - Adjustable liquid flow, surface scale, tilt, three-color palette, and contrast.
 - Strips with independent count, length, length variation, cut angle, displacement, irregularity, gaps, and four displacement patterns.
 - Adjustable gloss, light direction, and strip depth. Enable **Drag to move light** in Finish to move its light from the preview; this interaction is off by default.
@@ -45,6 +47,7 @@ index.html          Accessible application shell and dialogs
 src/
   app.js            Controls, preview orchestration, persistence, and export UI
   surface-editor.js Direct-manipulation editor, bend points, and editing history
+  preview.js        Fullscreen wallpaper with auto-hiding edge controls
   model.js          Recipe schema, validation, serialization, export sizing
   presets.js        Curated recipes and palettes
   renderer.js       WebGL context, uniforms, export and resource lifecycle

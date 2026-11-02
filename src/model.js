@@ -4,7 +4,7 @@ export const LIMITS = {
   count: [2,100], angle: [-90,90], offset: [0,100], variation: [0,100], gap: [0,40], length: [10,100], lengthVariation: [0,100],
   gloss: [0,100], lightAngle: [-180,180], relief: [0,100], textureAmount: [0,100],
   grain: [0,100], grainSize: [1,5], vignette: [0,100], seed: [1,999999], phase: [-100000,100000],
-  turbulence:[0,100],warpScale:[20,300],stretch:[25,250],position:[0,100],centerX:[0,100],centerY:[0,100]
+  turbulence:[0,100],warpScale:[20,300],stretch:[25,250],position:[0,100],centerX:[0,100],centerY:[0,100],animationSpeed:[0,10]
 };
 export const ENUMS = {
   material: ['liquid','silk','chrome','ripple'], texture: ['smooth','frosted','brushed','woven'],
@@ -17,7 +17,7 @@ export const DEFAULT = {
   slits:true,count:24,angle:0,offset:38,variation:25,gap:0,length:100,lengthVariation:0,distribution:'wave',
   gloss:64,lightAngle:-35,relief:52,edgeShading:true,texture:'smooth',textureAmount:30,
   grain:24,grainSize:1,vignette:30,seed:14829,aspect:'16:9',phase:0,
-  pattern:'ribbons',turbulence:30,warpScale:100,stretch:100,position:0,centerX:50,centerY:50,points:[]
+  pattern:'ribbons',turbulence:30,warpScale:100,stretch:100,position:0,centerX:50,centerY:50,points:[],animationSpeed:1
 };
 export function sanitizeRecipe(input = {}) {
   const output = {...DEFAULT,points:[]};
@@ -38,7 +38,13 @@ export function sanitizeRecipe(input = {}) {
     return point;
   }):[];
   output.seed = Math.round(output.seed); output.count = Math.round(output.count);
+  output.phase=wrapPhase(output.phase,output.pattern);
   return output;
+}
+export function phasePeriod(pattern) { return pattern==='vortex'?Math.PI*2:Math.PI*4; }
+export function wrapPhase(phase,pattern) {
+  const period=phasePeriod(pattern),remainder=phase%period;
+  return remainder<0?remainder+period:remainder===0?0:remainder;
 }
 export function aspectRatio(aspect) { const [w,h] = aspect.split(':').map(Number); return w/h; }
 export function exportDimensions(longEdge, aspect) {
