@@ -7,7 +7,7 @@
   --paper:#f4f3ef;
   --line:#dcdcd4;
   --muted:#85857c;
-  --coral:#ed5b47;
+  --coral:#e5e5e5;
   --ink:#24241f
 }
 * {
@@ -2138,7 +2138,7 @@ dialog {
   --paper:#0d0d0d;
   --line:#2d2d2d;
   --muted:#9c9c9c;
-  --coral:#f17a63;
+  --coral:#e5e5e5;
   --ink:#e0e0e0
 }
 .topbar {
@@ -2475,7 +2475,7 @@ kbd {
   border-color:#e0e0e099
 }
 .surface-handle.selected {
-  background:#f17a63;
+  background:#e5e5e5;
   color:#22150e
 }
 .comparison-labels span {
@@ -2500,7 +2500,7 @@ kbd {
 .button-dark:hover { background:#ffffff; }
 
 /* Quiet black chrome: flat surfaces, consistent text, a single visual hierarchy. */
-:root { background:#080808; --line:#282828; --coral:#f17a63; }
+:root { background:#080808; --line:#282828; --coral:#e5e5e5; }
 .topbar { border-bottom-color:#232323; height:76px; }
 .brand-description { color:#8b8b8b; }
 .header-divider { background:#2b2b2b; }
