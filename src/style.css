@@ -2602,3 +2602,6 @@ dialog,#surface-designer { background:#121212; border-color:#363636; border-radi
 .control-tab.active:after { background:var(--coral); }
 .preset-card.active .preset-image { outline-color:var(--coral); }
 .pattern-choices button.active { border-color:var(--coral); }
+
+#wallpaper { cursor:default; touch-action:pan-y; }
+.light-drag-enabled #wallpaper { cursor:crosshair; touch-action:none; }

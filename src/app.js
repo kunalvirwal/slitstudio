@@ -225,10 +225,11 @@ $('#retry-renderer').addEventListener('click',()=>{
   canvas.addEventListener('renderer-error',e=>showRendererError(new Error(e.detail)));initRenderer();
 });
 // Move the light source by dragging over the actual artwork.
-let dragging=false;
-$('#canvas-frame').addEventListener('pointerdown',event=>{if(view==='compare'||event.target!==$('#wallpaper'))return;dragging=true;event.target.setPointerCapture(event.pointerId);});
+let dragging=false,dragLightEnabled=false;
+$('#drag-light').addEventListener('change',event=>{dragLightEnabled=event.target.checked;$('#canvas-frame').classList.toggle('light-drag-enabled',dragLightEnabled);if(!dragLightEnabled)dragging=false;});
+$('#canvas-frame').addEventListener('pointerdown',event=>{if(!dragLightEnabled||view==='compare'||event.target!==$('#wallpaper'))return;dragging=true;event.target.setPointerCapture(event.pointerId);});
 $('#canvas-frame').addEventListener('pointermove',event=>{
-  if(!dragging)return;const rect=$('#wallpaper').getBoundingClientRect();
+  if(!dragLightEnabled||!dragging)return;const rect=$('#wallpaper').getBoundingClientRect();
   const x=(event.clientX-rect.left)/rect.width-.5,y=.5-(event.clientY-rect.top)/rect.height;
   updateRecipe({lightAngle:Math.round(Math.atan2(y,x)*180/Math.PI)});
 });

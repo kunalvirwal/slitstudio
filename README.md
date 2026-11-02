@@ -26,7 +26,7 @@ npm run preview # Serve the production output
 - Surface editing undo/redo, flow complexity, turbulence, stretch, band offset, and direct animation phase scrubbing. Dragging phase pauses playback; its value advances visibly during animation.
 - Adjustable liquid flow, surface scale, tilt, three-color palette, and contrast.
 - Strips with independent count, length, length variation, cut angle, displacement, irregularity, gaps, and four displacement patterns.
-- Adjustable gloss, light direction, and strip depth. Drag over the artwork to move its light.
+- Adjustable gloss, light direction, and strip depth. Enable **Drag to move light** in Finish to move its light from the preview; this interaction is off by default.
 - Truly gapless strips at zero spacing, with a separate edge-shading switch for clean joins.
 - Smooth, frosted glass, brushed metal, and woven silk textures, with independent texture strength.
 - Film grain, grain size, vignette, and subtle anti-banding dither.
