@@ -3,6 +3,7 @@ import { PRESETS, PALETTES } from './presets.js';
 import { WallpaperRenderer } from './renderer.js';
 import { SurfaceEditor } from './surface-editor.js';
 import { ImmersivePreview } from './preview.js';
+import { VideoExportDialog } from './video-export.js';
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
@@ -173,7 +174,8 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden&&animation)
 function updateExportLabels() {
   for(const size of [1920,3840]) $('#size-'+size).textContent=exportDimensions(size,recipe.aspect).join(' × ');
 }
-function openExport() {setAnimation(false);updateExportLabels();$('#export-error').hidden=true;$('#export-dialog').showModal();}
+function openExport() {setAnimation(false);updateExportLabels();$('#export-error').hidden=true;videoExport.showImage();$('#export-dialog').showModal();}
+const videoExport=new VideoExportDialog({getRecipe:()=>recipe,getMaxSize:()=>renderer?.maxSize||8192,onImage:openExport,onMessage:toast});
 $('#export-button').addEventListener('click',openExport);
 for(const button of $$('[data-close]')) button.addEventListener('click',()=>$('#'+button.dataset.close).close());
 for(const dialog of $$('dialog')) dialog.addEventListener('click',e=>{if(e.target===dialog){const box=dialog.getBoundingClientRect();if(e.clientX<box.left||e.clientX>box.right||e.clientY<box.top||e.clientY>box.bottom)dialog.close();}});

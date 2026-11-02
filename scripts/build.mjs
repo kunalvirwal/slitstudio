@@ -6,4 +6,7 @@ await mkdir(project + 'dist', { recursive: true });
 await cp(project + 'index.html', project + 'dist/index.html');
 await cp(project + 'src', project + 'dist/src', { recursive: true });
 await cp(project + 'public', project + 'dist', { recursive: true });
+await mkdir(project + 'dist/vendor', { recursive: true });
+await cp(project + 'node_modules/mediabunny/dist/bundles/mediabunny.min.mjs', project + 'dist/vendor/mediabunny.min.mjs');
+await cp(project + 'node_modules/mediabunny/LICENSE', project + 'dist/vendor/mediabunny-LICENSE.txt');
 console.log('Built Slit Studio → dist/');

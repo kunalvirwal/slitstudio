@@ -73,6 +73,14 @@ Zero spacing bypasses the gap mask entirely to avoid artificial one-pixel hairli
 
 ## Build and deployment
 
+### Animated video output
+
+`video-model.js` plans an export before resource allocation: even frame dimensions, frame rate, speed-derived duration, phase range, bitrate, and whether the range actually closes. Sampling excludes the repeated endpoint. Full-cycle and one-way exports advance linearly; ping-pong uses cosine easing to travel to the end phase and back with smooth turnarounds. A one-way clip spanning a full pattern cycle is correctly recognized as seamless too.
+
+`video-renderer.js` uses a dedicated WebGL context and passes each rendered frame to Mediabunny's WebCodecs-backed encoder with an explicit timestamp and duration. Encoding runs independently of real-time playback. Awaiting each frame's encoding applies backpressure; progress yields let the page paint and process cancellation. The output is muxed into MP4 or WebM, then previewed and downloaded, or streamed directly to a user-selected file where supported. Resources are released on completion, error, or cancellation.
+
+`video-export.js` shares the existing export modal with the image form, provides animated transitions, and probes codec support for the exact chosen dimensions, frame rate, and bitrate. The encoder library is loaded only when video export is opened. The build copies its browser bundle and license to `dist/vendor/`; the dev server exposes that same installed bundle on a dedicated route. No user content is uploaded to an encoding service.
+
 The editable code is in `src/`, with the HTML shell at the project root and static assets in `public/`. `npm run build` generates `dist/` by copying the source modules and assets. This intentionally uses native ES modules with no bundler dependency; a future Vite migration can preserve the module boundaries. The Sites manifest points at `dist/`. Generated files are ignored by Git.
 
 The local development server serves the project and blocks hidden paths and tool/test directories. It binds only to 127.0.0.1. Production hosting serves only `dist/`; it requires no Node.js server, database, secrets, or backend APIs.

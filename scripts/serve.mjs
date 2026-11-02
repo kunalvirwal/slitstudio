@@ -4,14 +4,15 @@ import { fileURLToPath } from 'node:url';
 import { resolve, sep, extname } from 'node:path';
 
 const root = resolve(fileURLToPath(new URL('../', import.meta.url)), process.argv.includes('--production') ? 'dist' : '.');
-const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.json': 'application/json' };
+const types = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.json': 'application/json' };
 const server = createServer(async (request, response) => {
   try {
     const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
     if (pathname.split('/').some(part => part.startsWith('.') || ['node_modules', 'scripts', 'test'].includes(part))) throw new Error('Private path');
-    const file = resolve(root, '.' + (pathname === '/' ? '/index.html' : pathname === '/favicon.svg' ? (process.argv.includes('--production') ? '/favicon.svg' : '/public/favicon.svg') : pathname));
+    const vendor = pathname === '/vendor/mediabunny.min.mjs' && !process.argv.includes('--production');
+    const file = vendor ? resolve(root,'node_modules/mediabunny/dist/bundles/mediabunny.min.mjs') : resolve(root, '.' + (pathname === '/' ? '/index.html' : pathname === '/favicon.svg' ? (process.argv.includes('--production') ? '/favicon.svg' : '/public/favicon.svg') : pathname));
     if (!file.startsWith(root + sep) && file !== root) throw new Error('Invalid path');
-    response.setHeader('Content-Type', types[extname(file)] || 'application/octet-stream');
+    response.setHeader('Content-Type', vendor ? 'text/javascript' : types[extname(file)] || 'application/octet-stream');
     response.setHeader('Cache-Control', 'no-store');
     response.end(await readFile(file));
   } catch {
