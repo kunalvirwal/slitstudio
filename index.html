@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f4f3ef">
+  <meta name="description" content="Shape liquid gradients. Cut light into strips. A hands-on generative wallpaper studio with glossy materials, textures, grain, and 4K export.">
+  <title>Slit Studio — Cut light into something new.</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./src/style.css">
+</head>
+<body>
+  <svg class="icon-library" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><defs>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-4-4 4 4 4-4M4 15v5h16v-5"/></symbol>
+    <symbol id="i-shuffle" viewBox="0 0 24 24"><path d="M3 6h3c4 0 8 12 12 12h3m-4-4 4 4-4 4M3 18h3c1.5 0 3-2 4.5-4m3-4C15 8 16.5 6 18 6h3m-4-4 4 4-4 4"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1 7M4 3v7h7"/></symbol>
+    <symbol id="i-expand" viewBox="0 0 24 24"><path d="M9 3H3v6m12-6h6v6M3 15v6h6m12-6v6h-6"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="m10 14 4-4m-6 6-1 1a4.2 4.2 0 0 1-6-6l5-5a4.2 4.2 0 0 1 6 0m0 12a4.2 4.2 0 0 0 6 0l5-5a4.2 4.2 0 0 0-6-6l-1 1" transform="translate(1 0) scale(.9)"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="m9 5 11 7-11 7Z"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+  </defs></svg>
+  <header class="topbar">
+    <a href="./" class="brand" aria-label="Slit Studio home"><span class="brand-mark"><i></i><i></i><i></i><i></i></span><strong>slit<span>studio</span><b>®</b></strong></a>
+    <span class="brand-description">A playground for light & texture</span>
+    <div class="header-actions"><button class="text-button" id="about-button">How it works <span>↗</span></button><span class="header-divider"></span><button class="button button-dark" id="export-button"><svg><use href="#i-download"/></svg><span>Export wallpaper</span></button></div>
+  </header>
+  <main>
+    <section class="workspace-heading"><div><p class="eyebrow"><span class="status-dot"></span> GENERATIVE WALLPAPER STUDIO</p><h1>Cut light into something new<span>.</span></h1></div><div class="heading-note">A little liquid. A little structure.<br>Entirely yours.</div></section>
+    <div class="studio">
+      <aside class="controls" aria-label="Wallpaper controls">
+        <div class="control-top"><span class="small-title">MAKE IT YOURS</span><button class="icon-button" id="reset-button" title="Reset to this preset" aria-label="Reset to this preset"><svg><use href="#i-reset"/></svg></button></div>
+        <div class="control-tabs" role="tablist" aria-label="Material controls"><button id="tab-surface" class="control-tab active" role="tab" aria-selected="true" aria-controls="panel-surface" data-tab="surface">Surface</button><button id="tab-slits" class="control-tab" role="tab" aria-selected="false" aria-controls="panel-slits" data-tab="slits" tabindex="-1">Slits</button><button id="tab-finish" class="control-tab" role="tab" aria-selected="false" aria-controls="panel-finish" data-tab="finish" tabindex="-1">Finish <span class="tiny-dot"></span></button></div>
+        <div class="control-panels">
+          <section id="panel-surface" role="tabpanel" aria-labelledby="tab-surface">
+            <div class="section-label">01 <span>THE MATERIAL</span></div>
+            <label class="field-label" for="material">Surface type</label><div class="select-wrap"><select id="material" data-setting="material"><option value="liquid">Liquid gradient</option><option value="silk">Liquid silk</option><option value="chrome">Polished chrome</option><option value="ripple">Ripple glass</option></select><span>⌄</span></div>
+            <div id="surface-sliders"></div>
+            <div class="section-label color-label">02 <span>THE PALETTE</span><button id="palette-cycle" class="inline-button" title="Try another palette" aria-label="Try another palette">Shuffle ↗</button></div>
+            <div class="color-inputs"><label><input type="color" id="color-dark" data-setting="dark" aria-label="Shadow color"><span>Shadow</span><code id="hex-dark"></code></label><label><input type="color" id="color-mid" data-setting="mid" aria-label="Body color"><span>Body</span><code id="hex-mid"></code></label><label><input type="color" id="color-light" data-setting="light" aria-label="Highlight color"><span>Light</span><code id="hex-light"></code></label></div>
+            <div id="color-sliders"></div>
+          </section>
+          <section id="panel-slits" role="tabpanel" aria-labelledby="tab-slits" hidden>
+            <div class="section-label">01 <span>THE CUT</span></div>
+            <label class="toggle-row" for="slits-enabled"><span>Slice the surface<small>Turn a gradient into a composition.</small></span><input id="slits-enabled" type="checkbox" data-setting="slits" role="switch"></label>
+            <div id="slit-sliders"></div>
+            <label class="field-label" for="distribution">Displacement pattern</label><div class="select-wrap"><select id="distribution" data-setting="distribution"><option value="wave">Wave</option><option value="cascade">Cascade</option><option value="random">Scattered</option><option value="alternate">Alternating</option></select><span>⌄</span></div>
+            <p class="panel-note">Each strip samples a different part of the same liquid surface. Change the offset to reveal new rhythms.</p>
+          </section>
+          <section id="panel-finish" role="tabpanel" aria-labelledby="tab-finish" hidden>
+            <div class="section-label">01 <span>LIGHT & REFLECTION</span></div><div id="light-sliders"></div>
+            <div class="section-label">02 <span>TEXTURE & ATMOSPHERE</span></div>
+            <label class="field-label" for="texture">Texture</label><div class="select-wrap"><select id="texture" data-setting="texture"><option value="smooth">Smooth</option><option value="frosted">Frosted glass</option><option value="brushed">Brushed metal</option><option value="woven">Woven silk</option></select><span>⌄</span></div>
+            <div id="finish-sliders"></div>
+          </section>
+        </div>
+        <div class="control-bottom"><div class="seed-row"><label for="seed">SEED</label><input id="seed" type="number" min="1" max="999999" data-setting="seed" aria-label="Random seed"><button id="new-seed" class="icon-button" aria-label="New seed" title="New seed"><svg><use href="#i-shuffle"/></svg></button></div><button class="button surprise-button" id="randomize"><svg><use href="#i-shuffle"/></svg>Surprise me<span>↗</span></button></div>
+      </aside>
+      <section class="canvas-workspace" aria-label="Wallpaper preview">
+        <div class="preview-toolbar"><div class="view-switch" role="group" aria-label="Preview mode"><button data-view="slit" class="active" aria-pressed="true"><span class="slit-icon">▥</span> Sliced</button><button data-view="surface" aria-pressed="false">Surface</button><button data-view="compare" aria-pressed="false">Compare</button></div><div class="preview-tools"><span class="live-label"><span></span> LIVE PREVIEW</span><button class="icon-button" id="fullscreen-button" aria-label="Expand preview" title="Expand preview"><svg><use href="#i-expand"/></svg></button></div></div>
+        <div class="art-stage" id="art-stage"><div class="canvas-frame" id="canvas-frame"><canvas id="wallpaper" aria-label="Generated liquid slit wallpaper"></canvas><div class="canvas-error" id="canvas-error" hidden><strong>We couldn’t start the renderer.</strong><p>This studio needs WebGL. Try enabling hardware acceleration or using another browser.</p><button class="button" id="retry-renderer">Try again</button></div><div class="comparison-labels" id="comparison-labels" hidden><span>CONTINUOUS SURFACE</span><span>SLICED RESULT</span></div><div class="compare-handle" id="compare-handle" hidden><span>↔</span></div><input type="range" min="5" max="95" value="50" class="compare-slider" id="compare-slider" aria-label="Surface and sliced comparison divider" hidden></div><div class="canvas-caption"><span id="canvas-title">01 / VERMILION</span><span>PROCEDURAL SERIES — SLIT STUDIO</span></div></div>
+        <div class="preview-bottom"><div class="canvas-actions"><button id="animate-button" class="subtle-button"><svg><use href="#i-play"/></svg><span>Animate</span></button><span class="mini-divider"></span><button id="share-button" class="subtle-button"><svg><use href="#i-link"/></svg><span>Copy recipe</span></button></div><div class="format-control"><svg class="format-icon" viewBox="0 0 24 18"><rect x="1" y="1" width="22" height="16" rx="2"/></svg><select id="aspect" aria-label="Canvas aspect ratio" data-setting="aspect"><option value="16:9">Desktop · 16:9</option><option value="16:10">Desktop · 16:10</option><option value="21:9">Ultrawide · 21:9</option><option value="9:16">Phone · 9:16</option><option value="1:1">Square · 1:1</option></select><span>⌄</span></div></div>
+      </section>
+    </div>
+    <section class="preset-section" aria-labelledby="preset-heading"><div class="preset-heading"><h2 id="preset-heading">A starting point, not a limit<span>.</span></h2><span>EXPLORE THE COLLECTION <svg><use href="#i-arrow"/></svg></span></div><div class="preset-grid" id="preset-grid"></div></section>
+    <footer><span>MADE OF MATH. FINISHED BY YOU.</span><span>Rendered on your device <i>·</i> No uploads. No accounts.</span><button id="footer-about">Behind the surface ↗</button></footer>
+  </main>
+  <dialog id="export-dialog" aria-labelledby="export-title"><div class="dialog-heading"><p class="eyebrow">TAKE IT WITH YOU</p><button class="icon-button" data-close="export-dialog" aria-label="Close export"><svg><use href="#i-close"/></svg></button></div><h2 id="export-title">A new look for your screen<span>.</span></h2><p class="dialog-description">The full artwork, rendered fresh at your chosen resolution.</p><label class="field-label" for="export-resolution">Resolution</label><div class="resolution-grid"><button class="resolution-option" data-size="1920">Full HD<small id="size-1920">1920 × 1080</small></button><button class="resolution-option active" data-size="3840">4K<small id="size-3840">3840 × 2160</small></button><button class="resolution-option" data-size="custom">Custom<small>Your dimensions</small></button></div><div class="custom-dimensions" id="custom-dimensions" hidden><label for="export-width">Width<input id="export-width" type="number" min="64" max="8192" value="3840"></label><span>×</span><label for="export-height">Height<input id="export-height" type="number" min="64" max="8192" value="2160"></label></div><label class="field-label" for="export-format">File format</label><div class="select-wrap"><select id="export-format"><option value="png">PNG · lossless</option><option value="jpeg">JPEG · smaller file</option></select><span>⌄</span></div><p class="export-note">Grain and texture scale with the artwork.<br>Your wallpaper is rendered locally and stays yours.</p><p id="export-error" role="alert" hidden></p><button class="button button-dark export-download" id="download-button"><svg><use href="#i-download"/></svg><span>Download wallpaper</span></button></dialog>
+  <dialog id="about-dialog" aria-labelledby="about-title"><div class="dialog-heading"><p class="eyebrow">BEHIND THE SURFACE</p><button class="icon-button" data-close="about-dialog" aria-label="Close how it works"><svg><use href="#i-close"/></svg></button></div><h2 id="about-title">One surface.<br>Endless possibilities<span>.</span></h2><ol class="how-steps"><li><span>01</span><div><h3>Make it liquid</h3><p>A continuous, warped gradient becomes a material. Shape its flow, color, and light.</p></div></li><li><span>02</span><div><h3>Find your rhythm</h3><p>Cut it into strips, rotate the cut, and displace each strip along the surface. Compare before and after.</p></div></li><li><span>03</span><div><h3>Give it a finish</h3><p>Add glossy reflections, frosted or brushed textures, film grain, and a vignette. Export up to 8,192 pixels per side.</p></div></li></ol><p class="about-inspiration">Inspired by the creative playgrounds at <a href="https://flowshape.art/" target="_blank" rel="noreferrer">Flowshape</a>, <a href="https://evoluteur.github.io/flow-fields/" target="_blank" rel="noreferrer">Flow Fields</a>, and <a href="https://wallpaper.sanguilmu.com/" target="_blank" rel="noreferrer">Sangu Wallpaper</a>.</p><p class="shortcuts"><kbd>R</kbd> Surprise me <kbd>Space</kbd> Animate <kbd>E</kbd> Export</p></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
