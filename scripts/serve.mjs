@@ -20,4 +20,8 @@ const server = createServer(async (request, response) => {
     response.end('Not found');
   }
 });
-server.listen(Number(process.env.PORT) || 4173, '127.0.0.1', () => console.log('Slit Studio: http://127.0.0.1:4173'));
+const hostOption = process.argv.indexOf('--host');
+const bindHost = hostOption === -1 ? '127.0.0.1' : process.argv[hostOption + 1];
+if (!bindHost || bindHost.startsWith('--')) throw new Error('Provide a hostname after --host.');
+const port = Number(process.env.PORT) || 4173;
+server.listen(port, bindHost, () => console.log(`Slit Studio: http://${bindHost}:${port}`));
